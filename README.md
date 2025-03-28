@@ -5,4 +5,4 @@ If you want to add them for whatever reason use `app-eselect/eselect-repository`
 
 From here:
 
-`# eselect repository add sokol08-overlay git https://github.com/Sokol08/xarblu-overlay`
+`# eselect repository add sokol08-overlay git https://github.com/Sokol08/sokol08-overlay`
