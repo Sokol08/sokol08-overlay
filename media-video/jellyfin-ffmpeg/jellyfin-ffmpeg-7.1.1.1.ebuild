@@ -130,7 +130,7 @@ RDEPEND="
 	>=virtual/libiconv-0-r1
 	dev-libs/libxml2:=
 	media-libs/harfbuzz:=
-	amf? ( media-video/amdgpu-pro-amf )
+	amf? ( >=media-video/amdgpu-pro-amf-1.4.36 )
 	nvenc? ( >=media-libs/nv-codec-headers-11.1.5.3 )
 	opencl? ( virtual/opencl )
 	qsv? ( media-libs/libvpl )
@@ -146,7 +146,7 @@ RDEPEND="
 "
 
 DEPEND="${RDEPEND}
-	amf? ( media-libs/amf-headers )
+	amf? ( >=media-video/amdgpu-pro-amf-1.4.36 )
 	vulkan? ( >=dev-util/vulkan-headers-1.3.277 )
 "
 
