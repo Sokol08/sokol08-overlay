@@ -13,7 +13,7 @@ if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/home-assistant/core.git"
 	EGIT_BRANCH="dev"
-	S="${WORKDIR}"
+	S="${WORKDIR}/${MY_PN}-${PV}"
 else
 	inherit pypi
 	MY_PV=${PV/_beta/b}
