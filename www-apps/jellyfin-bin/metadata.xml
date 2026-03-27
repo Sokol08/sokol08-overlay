@@ -2,8 +2,8 @@
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer type="person">
-		<email>xarblu@protonmail.com</email>
-		<name>Xarblu</name>
+		<email>sokol08.an.nsk@mail.ru</email>
+		<name>Sokol08</name>
 	</maintainer>
 	<use>
 		<flag name="intro-skipper">Setup index.html for the intro-skipper plugin</flag>
