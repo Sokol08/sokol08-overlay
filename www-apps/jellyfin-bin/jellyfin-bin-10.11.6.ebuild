@@ -29,6 +29,14 @@ else
 	S="${WORKDIR}/${MY_PN}"
 fi
 
+src_prepare() {
+	default
+
+	# https://github.com/jellyfin/jellyfin/issues/7471
+	# https://github.com/dotnet/runtime/issues/57784
+	rm libcoreclrtraceptprovider.so || die
+}
+
 src_uris() {
 	local baseuri="https://repo.jellyfin.org/files/server/linux"
 	case "${TYPE}" in
@@ -49,7 +57,8 @@ src_uris() {
 		SRC_URI+=" ) "
 	done
 }
-src_uris
+
+REQUIRED_USE="intro-skipper? ( vendored-ffmpeg )"
 
 DEPEND="
 	acct-user/jellyfin

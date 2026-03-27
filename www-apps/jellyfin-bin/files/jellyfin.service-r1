@@ -1,5 +1,5 @@
 [Unit]
-Description = Jellyfin Media Server
+Description=Jellyfin Media Server
 After=syslog.target network.target
 
 [Service]

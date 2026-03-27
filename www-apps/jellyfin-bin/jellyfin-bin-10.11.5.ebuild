@@ -49,7 +49,8 @@ src_uris() {
 		SRC_URI+=" ) "
 	done
 }
-src_uris
+
+REQUIRED_USE="intro-skipper? ( vendored-ffmpeg )"
 
 DEPEND="
 	acct-user/jellyfin
