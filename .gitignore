@@ -7,3 +7,5 @@
 /packages/
 /profiles/use.local.desc
 /updateManifest.sh
+/.claude/
+/.idea/

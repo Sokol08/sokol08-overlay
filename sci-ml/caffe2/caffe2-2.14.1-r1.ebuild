@@ -31,8 +31,11 @@ inherit python-single-r1 cmake cuda flag-o-matic prefix rocm
 MYPN=pytorch
 MYP=${MYPN}-${PV}
 
-# Build against upstream's pinned composable-kernel revision.
-CK_COMMIT=5a74dec07a894484b9489d0c0e00cd3b52652d18
+# CK: take the ROCm 10.1 generation instead of the 5a74dec0 commit that
+# pytorch 2.14.1 pins: mine does not compile under hip 7.16 (clang 23)
+# - it has the raw-buffer builtins returning a vector of signed vectors.
+# verified 2026-10-24
+CK_COMMIT=10.1
 CK_P=composable_kernel-${CK_COMMIT:0:8}
 
 FLASH_PV=2.7.4
@@ -45,7 +48,7 @@ HOMEPAGE="https://pytorch.org/"
 SRC_URI="
 	https://github.com/pytorch/${MYPN}/archive/refs/tags/v${PV}.tar.gz -> ${MYP}.tar.gz
 	rocm? (
-		https://github.com/ROCm/composable_kernel/archive/${CK_COMMIT}.tar.gz
+		https://github.com/ROCm/rocm-libraries/releases/download/therock-${CK_COMMIT}/composablekernel.tar.gz
 		-> ${CK_P}.tar.gz
 	)
 	cuda? (
@@ -85,6 +88,9 @@ REQUIRED_USE="
 # flash and mem-efficient attention; either packaged form provides them.
 # verified 2026-10-23
 # torch._C lives here; block older pytorch copies before merge.
+# PyTorch 2.14 profiler needs the newer kineto API (MetadataFieldCatalog.h):
+# p20260323 predates it. Keep kineto off-ROCm (-rocm), as before.
+# verified 2026-10-23
 RDEPEND="
 	${PYTHON_DEPS}
 	!!<sci-ml/pytorch-2.13.0
@@ -105,7 +111,7 @@ RDEPEND="
 	)
 	fbgemm? ( >=sci-ml/FBGEMM-1.4 <sci-ml/FBGEMM-1.5 )
 	gloo? ( >=sci-ml/gloo-2025.06.04[cuda?,rocm?] )
-	kineto? ( ~sci-ml/kineto-0.4.0_p20260323 )
+	kineto? ( >=sci-ml/kineto-0.4.0_p20260805 )
 	mimalloc? ( dev-libs/mimalloc )
 	mpi? ( virtual/mpi )
 	nnpack? (
@@ -325,6 +331,11 @@ src_prepare() {
 			-i cmake/public/LoadHIP.cmake || die
 		grep -qF "set(_hip_clang_dir \"$(hipconfig -l)\")" \
 			cmake/public/LoadHIP.cmake || die "LoadHIP clang default not rewritten"
+
+		# rocm-libraries tarball unpacks as composablekernel/... name is
+		# normalized to ${CK_P} so the CMake paths below keep working.
+		[[ -d ${WORKDIR}/composablekernel ]] || die "CK tarball layout unexpected"
+		mv -- "${WORKDIR}/composablekernel" "${WORKDIR}/${CK_P}" || die
 
 		# Drop when composable-kernel becomes a system dependency.
 		sed -e "s:third_party/composable_kernel:../composable_kernel-${CK_COMMIT}:g" \

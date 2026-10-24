@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata
+    SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription lang="en">
+		Prebuilt gfx110x flash-attention runtime for AMD GPUs (AOT Triton v3).
+		Install-only package: C++ headers, libaotriton_v2 and the gfx110x
+		kernel images. PyTorch 2.14.x with rocm+flash links against this
+		(runtime 0.13b API: aotriton::v3::flash::VarlenType).
+	</longdescription>
+</pkgmetadata>
