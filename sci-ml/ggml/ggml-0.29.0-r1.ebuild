@@ -25,7 +25,10 @@
 # - the host C/CXX compiler stays the system toolchain (gcc): the
 #   standard ROCm practice is gcc for host code and clang for the HIP
 #   device code, and forcing amdclang as C/CXX breaks here because the
-#   system CFLAGS contain gcc-only switches (e.g. -fvect-cost-model=dynamic).
+#   system CFLAGS contain gcc-only switches (e.g. -fvect-cost-model=dynamic),
+#   - CMAKE_HIP_FLAGS is set explicitly to a clang-compatible subset of
+#   CXXFLAGS, because CMake initializes it from CMAKE_CXX_FLAGS and
+#   amdclang++ falls over on the gcc-only ones mentioned above.
 #
 # The GGML Hips CMake (src/ggml-hip/CMakeLists.txt) forwards
 # GPU_TARGETS/CMAKE_HIP_ARCHITECTURES to enable_language(HIP) and
@@ -182,11 +185,28 @@ src_configure() {
 		hips_archs="${hips_archs%;}"
 		[[ -n ${hips_archs} ]] || die "amdgpu_targets USE flags are empty but the rocm USE flag requires amdgpu targets"
 
+		# CMake initializes CMAKE_HIP_FLAGS from CMAKE_CXX_FLAGS, so the
+		# HIP device compiler would inherit the full system CXXFLAGS and
+		# abort on gcc-only switches (the profile's COMMON_FLAGS carries
+		# -fvect-cost-model=dynamic, which amdclang++ does not know).
+		# Build an explicitly clang-compatible subset from CXXFLAGS;
+		# extend the skip list if a newer amdclang/DIST combination
+		# rejects more of them.
+		local hip_flags=''
+		local f
+		for f in ${CXXFLAGS}; do
+			case ${f} in
+				-fvect-cost-model=*) ;;	# gcc-only cost-model knob
+				*) hip_flags+=" ${f}" ;;
+			esac
+		done
+
 		mycmakeargs+=(
 			-DCMAKE_HIP_PLATFORM=amd
 			-DCMAKE_HIP_COMPILER="${rocm_root}/lib/llvm/bin/amdclang++"
 			-DCMAKE_HIP_COMPILER_ROCM_ROOT="${rocm_root}"
 			-DCMAKE_HIP_ARCHITECTURES="${hips_archs}"
+			-DCMAKE_HIP_FLAGS="${hip_flags# }"
 			-DGPU_TARGETS=$(get_amdgpu_flags)
 		)
 	fi
