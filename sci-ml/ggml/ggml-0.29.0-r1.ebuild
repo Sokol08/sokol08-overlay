@@ -22,8 +22,10 @@
 # - a clean CMAKE_HIP_ARCHITECTURES: rocm.eclass appends ";" to every
 #   AMDGPU_TARGETS element, and the trailing one leaves an empty CMake
 #   list element; GPU_TARGETS is kept for toolchains that consume it,
-# - host CC/CXX pointed at the same clang so host and device code come
-#   from one LLVM toolchain (plain /usr/bin/c++ is gcc 16 here).
+# - the host C/CXX compiler stays the system toolchain (gcc): the
+#   standard ROCm practice is gcc for host code and clang for the HIP
+#   device code, and forcing amdclang as C/CXX breaks here because the
+#   system CFLAGS contain gcc-only switches (e.g. -fvect-cost-model=dynamic).
 #
 # The GGML Hips CMake (src/ggml-hip/CMakeLists.txt) forwards
 # GPU_TARGETS/CMAKE_HIP_ARCHITECTURES to enable_language(HIP) and
@@ -172,9 +174,6 @@ src_configure() {
 		local rocm_root="${ROCM_PATH:-/opt/therock-bin}"
 		export ROCM_PATH="${rocm_root}"
 		export HIP_PATH="${rocm_root}"
-		# Host and device code come from the same AMD clang.
-		export CC="${rocm_root}/lib/llvm/bin/amdclang"
-		export CXX="${rocm_root}/lib/llvm/bin/amdclang++"
 
 		# rocm.eclass tags every target with ";" (gfx1100;); join the
 		# elements back into one list and drop the trailing separator
