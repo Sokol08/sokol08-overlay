@@ -1,0 +1,17 @@
+--- a/src/prefill/prefill.cpp	2026-11-16 02:58:32.244835982 +0700
++++ b/src/prefill/prefill.cpp	2026-11-16 02:58:32.247780990 +0700
+@@ -168,6 +168,14 @@ void experts_native(const Batch&, const
+ bool native_wide() { return false; }
+ void experts_native(const WideBatch&, const NativeGeom&, int, int64_t, const void*, const void*, const int32_t*, void*,
+                     float*, void*) {}
++// gentoo-portage-fix (v0.2.13.1): the two dm_f16 accessors above are
++// referenced by Prefill::run_impl but were missing from this
++// stub block, so any build without STRATA_PREFILL_FUSED (every
++// HIP build with STRATA_PREFILL_MMQ off) failed to link.
++// Without the fused kernels nothing writes F16 down rows:
++// want is a no-op, used is always false (the default everywhere else).
++void want_dm_f16(bool) {}
++bool dm_f16_used() { return false; }
+ }  // namespace strata::prefill::fused
+ #endif
+ #ifndef STRATA_PREFILL_WS
