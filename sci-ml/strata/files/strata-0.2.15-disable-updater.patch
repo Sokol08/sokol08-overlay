@@ -1,0 +1,20 @@
+# The engine's update check reads a release feed by default; an install Portage
+# manages is updated by Portage, so the default feed is emptied (only a feed
+# signed with a key in update_keys.json was ever accepted - this removes the
+# default URL, not the mechanism: STRATA_UPDATE_FEED still names one).
+#
+# Ported from PF4Public/gentoo-overlay sci-misc/strata files/strata-disable-updater.patch
+# (Copyright 1999-2026 Gentoo Authors, GPL-2.0), reduced to its Python half: that
+# patch's other hunk empties the tauri app's updater endpoints, and this ebuild
+# does not build apps/desktop at all.
+--- a/strata_cli/update_cmd.py	2026-11-18 01:17:02.317454638 +0700
++++ b/strata_cli/update_cmd.py	2026-11-18 01:17:02.318187670 +0700
+@@ -32,7 +32,7 @@
+ 
+ #: Where the feed is read when nothing else is set: the files of the latest GitHub release of Niko1221/Strata (the same folder the
+ #: one-line installers use). Only a feed signed with a key in update_keys.json (or STRATA_UPDATE_TRUSTED_KEYS) is accepted.
+-DEFAULT_FEED = "https://github.com/Niko1221/Strata/releases/latest/download/strata-feed.json"
++DEFAULT_FEED = ""
+ ENV_FEED = "STRATA_UPDATE_FEED"
+ 
+ ENV_APP_VERSION = "STRATA_APP_VERSION"
